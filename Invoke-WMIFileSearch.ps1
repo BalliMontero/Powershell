@@ -58,10 +58,17 @@ function Invoke-WMIFileSearchIP
      param
      (
          [Object]
-         $IPAddress
+         $IPAddress,
+         [Object]
+         $Creds
      )
 
+    if (!$Creds){
     $getcreds = Get-Credential
+    }else
+    {
+    $getcreds = $Creds
+    }
 
     $ping = New-Object System.Net.NetworkInformation.Ping
     if (($ping.send($IPAddress, 10)).Status-eq 'Success')
@@ -108,7 +115,7 @@ function Invoke-WMIFileSearchIPRangeCIDR
      $iprangefull = New-IPv4RangeFromCIDR $IPRangeCIDR
      foreach ($ip in $iprangefull) {
 
-     Invoke-WMIFileSearchIP -IPAddress $ip
+     Invoke-WMIFileSearchIP -IPAddress $ip -Creds $getcreds
 
      }
      

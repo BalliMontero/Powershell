@@ -190,7 +190,7 @@ function Invoke-WMIFileSearchIP
     {
         Write-Host `n'Host is alive: ' $IPAddress
 
-        $wmiquery = "SELECT * FROM CIM_DataFile WHERE Drive ='C:' AND Path='\\windows\\' AND Extension='exe' AND CreationDate > '10/03/2015' "
+        $wmiquery = "SELECT * FROM CIM_DataFile WHERE Drive ='C:' AND Path='\\windows\\' AND Extension='exe' AND CreationDate > '01/01/2015' "
         Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) | foreach {Write-Host $_.Name}
 
         #Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) | where-object Name -match '[a-z][a-z][a-z][a-z][a-z][a-z][a-z][a-z].exe' |foreach {Write-Host $_.Name}

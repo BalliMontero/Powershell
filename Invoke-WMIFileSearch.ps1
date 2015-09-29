@@ -1,5 +1,50 @@
 <#
 .Synopsis
+    Generates a list of IPv4 IP Addresses given a Start and End IP.
+.DESCRIPTION
+    Generates a list of IPv4 IP Addresses given a Start and End IP.
+.EXAMPLE
+    Generating a list of IPs from CIDR
+
+    Get-IPRange 192.168.1.0/24
+    
+.EXAMPLE
+    Generating a list of IPs from Range
+
+    Get-IPRange -Range 192.168.1.1-192.168.1.50
+#>
+function New-IPv4Range
+{
+  param(
+    [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0)]
+           $StartIP,
+           
+    [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=2)]
+           $EndIP      
+  )
+  
+    # created by Dr. Tobias Weltner, MVP PowerShell
+    $ip1 = ([System.Net.IPAddress]$StartIP).GetAddressBytes()
+    [Array]::Reverse($ip1)
+    $ip1 = ([System.Net.IPAddress]($ip1 -join '.')).Address
+
+    $ip2 = ([System.Net.IPAddress]$EndIP).GetAddressBytes()
+    [Array]::Reverse($ip2)
+    $ip2 = ([System.Net.IPAddress]($ip2 -join '.')).Address
+
+    for ($x=$ip1; $x -le $ip2; $x++) {
+        $ip = ([System.Net.IPAddress]$x).GetAddressBytes()
+        [Array]::Reverse($ip)
+        $ip -join '.'
+    }
+}
+
+<#
+.Synopsis
     Generates a IP Address Objects for IPv4 and IPv6 Ranges.
 .DESCRIPTION
     Generates a IP Address Objects for IPv4 and IPv6 Ranges given a ranges in CIDR or

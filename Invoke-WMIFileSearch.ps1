@@ -189,11 +189,25 @@ function Invoke-WMIFileSearchIP
     if (($ping.send($IPAddress, 10)).Status-eq 'Success')
     {
         Write-Host `n'Host is alive: ' $IPAddress
-
-        $wmiquery = "SELECT * FROM CIM_DataFile WHERE Drive ='C:' AND Path='\\windows\\' AND Extension='exe' AND CreationDate > '01/01/2015' "
-        Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) | foreach {Write-Host $_.Name}
-
-        #Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) | where-object Name -match '[a-z][a-z][a-z][a-z][a-z][a-z][a-z][a-z].exe' |foreach {Write-Host $_.Name}
+        
+        $wmiquery = "Select * from Win32_Share"
+        $availableShares = Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) 
+        foreach ($share in $availableShares){
+        
+        if ($share.Name -ne 'IPC$'){
+            Write-Host "Testing SHARE: "$share.Name
+            $drive = ($share.Path).Substring(0,1)
+            $path = (($share.Path).Substring(2)).Replace('\','\\')
+            $path = $path+"\\"
+            $path = $path.Replace('\\\\\\\\','\\')
+            $path = $path.Replace('\\\\\\','\\')
+            $path = $path.Replace('\\\\','\\')
+           
+            $wmiquery = "SELECT * FROM CIM_DataFile WHERE Drive='"+$drive+":' AND Path='"+$path+"' AND Extension='exe' AND CreationDate > '01/01/2015' "
+            Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) | foreach{ if ($_.Name -match '[a-z][a-z][a-z][a-z][a-z][a-z][a-z][a-z].exe'){write-host $_.Name} }
+            }
+     }
+        
     }   
 }
 

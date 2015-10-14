@@ -191,9 +191,6 @@ function Invoke-WMIActivationIP
         Write-Host `n'Host is alive: ' $IPAddress
         
         $wmiquery_svc = "Select * From SoftwareLicensingProduct"
-        Get-WmiObject -Query $wmiquery_svc -ComputerName $IPAddress -Credential($getcreds) | foreach{ if ($_.Name -match '[a-z][a-z][a-z][a-z][a-z][a-z][a-z][a-z]'){write-host $_.Name} }
-
-        $wmiquery = "Select * from Win32_Share"
         $isActivated = Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) 
         $isActivated
      }

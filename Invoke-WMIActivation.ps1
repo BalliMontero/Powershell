@@ -197,8 +197,7 @@ function Invoke-WMIActivationIP
         $isActivated = Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) 
         $isActivated
      }
-        
-    }   
+           
 }
 
 <#

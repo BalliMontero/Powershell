@@ -190,7 +190,7 @@ function Invoke-WMIActivationIP
     {
         Write-Host `n'Host is alive: ' $IPAddress
         
-        $wmiquery_svc = "Select * From SoftwareLicensingProduct"
+        $wmiquery = "Select * From SoftwareLicensingProduct"
         $isActivated = Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) 
         $isActivated
      }

@@ -160,7 +160,7 @@ $runme =
     $getcreds = $Creds
     $Port = 135
     $Socket = New-Object Net.Sockets.TcpClient
-        
+    $Socket.client.ReceiveTimeout = 2000
     $ErrorActionPreference = 'SilentlyContinue'
     $Socket.Connect($IPAddress, $Port)
     $ErrorActionPreference = 'Continue'

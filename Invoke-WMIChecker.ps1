@@ -158,7 +158,6 @@ $runme =
      )
 
     $getcreds = $Creds
-
     $Port = 135
     $Socket = New-Object Net.Sockets.TcpClient
         
@@ -168,7 +167,7 @@ $runme =
     
     if ($Socket.Connected) {
         #Object to store result    
-        $endpointResult = New-Object PSObject | Select-Object Host, PortOpen, LoggedOnUsers, LocalAdministrators, SharesTested, FilesFound
+        $endpointResult = New-Object PSObject | Select-Object Host, PortOpen, LoggedOnUsers, LocalAdministrators, Members, SharesTested, FilesFound
         $endpointResult.PortOpen = 'Open'
         $endpointResult.Host = $IPAddress
         $Socket.Close()        
@@ -182,7 +181,6 @@ $runme =
     {
 
         # Get logged in users from remote machine
-        $endpointResult.ip = "Testing if any logged on users have Local Admin privileges: $IPAddress "
         $proc = Get-WmiObject -ComputerName $IPAddress -Credential $getcreds -query "SELECT * from win32_process WHERE Name = 'explorer.exe'"
 
         # Go through collection of processes and check for local admin rights
@@ -191,7 +189,6 @@ $runme =
             $user = ($p.GetOwner()).User
             $domain = ($p.GetOwner()).Domain
             $username = "$domain\$user"
-
             $endpointResult.LoggedOnUsers += "'$username' " 
             
             # Get local admin users  
@@ -210,7 +207,7 @@ $runme =
                     $arr += ("$domain\$name").Replace('"','')
                     $currentuser = ("$domain\$name").Replace('"','')
                     [Array]::Sort($arr) 
-
+                    $endpointResult.Members += "'$currentuser' "
                     if ($currentuser -contains $username)
                     {
                     $endpointResult.LocalAdministrators += "'$currentuser' "
@@ -225,7 +222,7 @@ $runme =
             $availableShares = Get-WmiObject -Query $wmiquery -ComputerName $IPAddress -Credential($getcreds) 
             foreach ($share in $availableShares){
                 if ($share.Name -eq 'ADMIN$'){
-                    $sharename = $share.Name
+                    $sharename = $share.Name                   
                     $endpointResult.SharesTested += "'$sharename' "
                     $drive = ($share.Path).Substring(0,1)
                     $path = (($share.Path).Substring(2)).Replace('\','\\')
@@ -267,11 +264,11 @@ $runme =
 .DESCRIPTION
    WMI Tool written to search for files younger than a month on network shares. This also searches is the current logged in user is part of the Local Administrators group. All communications is done over Windows RPC Ports (TCP 135)
 .EXAMPLE
-   Invoke-WMIChecker -IPAddress 172.16.0.10
+   Invoke-WMIChecker -IPAddress 172.16.0.205
 .EXAMPLE
-   Invoke-WMIChecker -IPRangeCIDR 172.16.0.10/24 -Threads 64 -Allshares 1
+   Invoke-WMIChecker -IPRangeCIDR 172.16.0.0/22 -Threads 100 -Allshares 1
 .EXAMPLE
-   Invoke-WMIChecker -List C:\Temp\Hostlist.txt -Threads 30 -Allshares 0
+   Invoke-WMIChecker -IPList C:\Temp\Hostlist.txt -Threads 30 -Allshares 0
 .INPUTS
    Inputs to this cmdlet (if any)
 .OUTPUTS
@@ -319,7 +316,7 @@ function Invoke-WMIChecker
 
     #Multithreading setup
     # create a pool of maxThread runspaces
-    if (!$Threads){$Threads = 10}   
+    if (!$Threads){$Threads = 64}   
     $pool = [runspacefactory]::CreateRunspacePool(1, $Threads)   
     $pool.Open()
     $endpointResults = @()

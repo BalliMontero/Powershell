@@ -188,9 +188,11 @@ $runme =
             $temp = '' | Select-Object Computer, Domain, User
             $user = ($p.GetOwner()).User
             $domain = ($p.GetOwner()).Domain
+            if($user){
             $username = "$domain\$user"
             $endpointResult.LoggedOnUsers += "'$username' " 
-            
+            }
+
             
             # Get local admin users  
             $arr = @()   
@@ -208,8 +210,10 @@ $runme =
                     $arr += ("$domain\$name").Replace('"','')
                     $currentuser = ("$domain\$name").Replace('"','')
                     [Array]::Sort($arr) 
+                    if ($currentuser)
+                    {
                     $endpointResult.Members += "'$currentuser' "
-                    
+                    }
                     if ($currentuser -contains $username)
                     {
                     $endpointResult.LocalAdministrators += "'$currentuser' "

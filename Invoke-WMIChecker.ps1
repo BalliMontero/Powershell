@@ -207,7 +207,10 @@ $runme =
                     $arr += ("$domain\$name").Replace('"','')
                     $currentuser = ("$domain\$name").Replace('"','')
                     [Array]::Sort($arr) 
+                    if ($currentuser)
+                    {
                     $endpointResult.Members += "'$currentuser' "
+                    }
                     if ($currentuser -contains $username)
                     {
                     $endpointResult.LocalAdministrators += "'$currentuser' "

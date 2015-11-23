@@ -188,8 +188,10 @@ $runme =
             $temp = '' | Select-Object Computer, Domain, User
             $user = ($p.GetOwner()).User
             $domain = ($p.GetOwner()).Domain
+            if($user){
             $username = "$domain\$user"
             $endpointResult.LoggedOnUsers += "'$username' " 
+            }
             
             # Get local admin users  
             $arr = @()   

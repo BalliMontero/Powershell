@@ -154,7 +154,9 @@ $runme =
          [Object]
          $Creds,
          [Bool]
-         $Allshares
+         $Allshares,
+         [Object]
+         $Command
      )
 
     $getcreds = $Creds
@@ -179,7 +181,10 @@ $runme =
    
     if ($endpointResult.PortOpen -eq 'Open')
     {
-
+        if ($command) {
+        # run a command of my choice
+        Invoke-WmiMethod -Path Win32_process -Name create -ComputerName $IPAddress -Credential $getcreds -ArgumentList $Command
+        }
         # Get logged in users from remote machine
         $proc = Get-WmiObject -ComputerName $IPAddress -Credential $getcreds -query "SELECT * from win32_process WHERE Name = 'explorer.exe'"
 
@@ -301,15 +306,22 @@ function Invoke-WMIChecker
          [Object]
          $Threads,
          [Bool]
-         $Allshares
+         $Allshares,
+         [Object]
+         $Command,
+         [Object]
+         $username,
+         [Object]
+         $password
      )
     
-    #$username = 'domain\useraccount'
-    #$password = 'Password1'
-    #$PSS = ConvertTo-SecureString $password -AsPlainText -Force
-    #$getcreds = new-object system.management.automation.PSCredential $username,$PSS
-    
-    $getcreds = Get-Credential
+    if ($username) { 
+        $PSS = ConvertTo-SecureString $password -AsPlainText -Force
+        $getcreds = new-object system.management.automation.PSCredential $username,$PSS
+    } else {
+        $getcreds = Get-Credential
+    }
+
     if ($IPList) {$iprangefull = Get-Content $IPList}
     if ($IPRangeCIDR) {$iprangefull = New-IPv4RangeFromCIDR $IPRangeCIDR}
     if ($IPAddress) {$iprangefull = $IPAddress}
@@ -348,7 +360,8 @@ function Invoke-WMIChecker
         [void]$ps[$i].AddScript($runme)
         [void]$ps[$i].AddParameter('IPAddress', $endpoint)
         [void]$ps[$i].AddParameter('Creds', $getcreds) 
-        [void]$ps[$i].AddParameter('Allshares', $Allshares)    
+        [void]$ps[$i].AddParameter('Allshares', $Allshares) 
+        [void]$ps[$i].AddParameter('Command', $Command)   
         # start job
         $jobs += $ps[$i].BeginInvoke();
      
